@@ -1,5 +1,15 @@
 # GMD PROJECT - MY SYMPTOMS
 
+## Data Mapping 
+
+<img width="877" height="732" alt="Capture d’écran 2026-10-22 à 11 35 11" src="https://github.com/user-attachments/assets/3dd61392-1017-4e38-a931-3444134df3da" />
+
+## App visualisation 
+
+<img width="796" height="646" alt="Capture d’écran 2026-10-22 à 11 35 40" src="https://github.com/user-attachments/assets/c7ccbae4-a923-4b03-9ad2-5ba153133f96" />
+
+
+
 ##  How to Launch the Website
 
 
