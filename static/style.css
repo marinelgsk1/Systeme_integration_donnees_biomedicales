@@ -1,0 +1,429 @@
+/* ---------- NAVBAR ---------- */
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 999;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    background: rgba(47, 128, 237, 0.85); /* transparence */
+    color: white;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.nav-title {
+    font-size: 24px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+/* ---------- GÉNÉRAL ---------- */
+body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: transparent; 
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 960px;
+    margin: 120px auto 30px; /* padding-top ajusté à cause de la navbar fixe */
+    padding: 30px;
+    background: transparent;
+    border-radius: 20px;
+    box-shadow: none;
+    backdrop-filter: none;
+}
+
+h1, h2, h3 {
+    color: #34495e;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+form {
+    margin-bottom: 40px;
+}
+
+input[type="text"],
+textarea,
+select {
+    width: 100%;
+    padding: 14px;
+    margin: 12px 0 20px;
+    border: none;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.05);
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #a8dadc;
+}
+
+button {
+    background: linear-gradient(to right, #56ccf2, #2f80ed);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(to right, #45aaf2, #1e90ff);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* ---------- CHAMP SYMPTÔMES MULTI-TAG ---------- */
+.symptom-input-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    min-height: 55px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.6);
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
+    border: 1px solid #ddd;
+    transition: box-shadow 0.2s ease;
+    cursor: text;
+    backdrop-filter: blur(6px);
+}
+
+.symptom-input-container input[type="text"] {
+    flex: 1;
+    min-width: 120px;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 15px;
+    padding: 8px;
+    margin: 2px 0;
+    color: #2c3e50;
+}
+
+.symptom-tag {
+    display: inline-flex;
+    align-items: center;
+    background-color: #2f80ed;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 14px;
+    animation: fadeIn 0.3s ease;
+    white-space: nowrap;
+}
+
+.symptom-tag span {
+    margin-left: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: color 0.2s ease;
+}
+
+.symptom-tag span:hover {
+    color: #ffb3b3;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ---------- BLOCS FORMULAIRES ---------- */
+.entry-block {
+    background: rgba(255, 255, 255, 0.75);
+    border-radius: 20px;
+    padding: 25px;
+    margin-bottom: 40px;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.entry-block:hover {
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* ---------- OPÉRATEURS ---------- */
+.operator-toggle {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.operator-toggle input[type="radio"] {
+    display: none;
+}
+
+.operator-toggle label {
+    padding: 10px 18px;
+    border-radius: 8px;
+    background: #f1f1f1;
+    color: #2c3e50;
+    font-weight: 500;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.operator-toggle label:hover {
+    background-color: #e6f0ff;
+    border-color: #2f80ed;
+    color: #2f80ed;
+}
+
+.operator-toggle input[type="radio"]:checked + label {
+    background-color: #2f80ed;
+    color: white;
+    border-color: #2f80ed;
+    font-weight: 600;
+}
+/* ---------- RÉSULTATS ---------- */
+.results-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.results-section div {
+    flex: 1;
+    min-width: 250px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.results-section div:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+li {
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    background: rgba(240, 248, 255, 0.6);
+    border-left: 5px solid #2f80ed;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: 0.2s ease;
+}
+
+li:hover {
+    background-color: rgba(220, 236, 255, 0.9);
+}
+
+span.delete-btn {
+    color: #e74c3c;
+    cursor: pointer;
+    float: right;
+    font-weight: bold;
+    transition: color 0.2s;
+}
+
+span.delete-btn:hover {
+    color: #c0392b;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 600px) {
+    .results-section {
+        flex-direction: column;
+    }
+
+    .container {
+        padding: 20px;
+    }
+
+    .symptom-input-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+
+hr {
+    margin: 20px 0;
+    border: none;
+    border-top: 1px solid #dddddd00;
+}
+
+.error-message {
+    color: red;
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+.hover-detail {
+    position: relative;
+    display: block;
+    cursor: pointer;
+}
+
+/* Infobulle absolument positionnée, retirée du layout */
+.tooltip-content {
+    position: absolute;
+    top: 100%; /* ✅ s'affiche juste en dessous */
+    left: 0;
+    margin-top: 12px;
+    padding: 5px 5px;
+    background-color: #ffffff !important;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    white-space: nowrap;
+    z-index: 9999;
+    box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+    font-size: 0.9rem;
+    color: #333;
+
+    opacity: 0;
+    pointer-events: none; /* ✅ ne bloque pas le curseur */
+    transition: opacity 0.2s ease;
+}
+
+/* Affichage seulement au hover */
+.hover-detail:hover .tooltip-content {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.source-stats {
+    background-color: #f4f6f8;
+    padding: 4px 8px !important;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    font-size: 12.5px;
+    color: #444;
+    box-shadow: none;
+    line-height: 1.4;
+}
+
+.source-stats span {
+  
+}
+/* ----- CHATBOT BOX ----- */
+.chatbot-box {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    max-width: 700px;
+    margin: 0 auto;
+    border: 1px solid #e0e0e0;
+    animation: fadeIn 0.3s ease;
+}
+
+.chatbot-box h3 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #2f80ed;
+}
+
+/* ----- MESSAGES ----- */
+.chatbot-messages {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    margin-bottom: 15px;
+    border: 1px solid #eaeaea;
+    scroll-behavior: smooth;
+}
+
+.chatbot-messages div {
+    margin-bottom: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    line-height: 1.4;
+    max-width: 90%;
+    word-wrap: break-word;
+}
+
+/* Message utilisateur */
+.chatbot-messages div:nth-child(odd) {
+    background-color: #dfefff;
+    align-self: flex-end;
+}
+
+/* Message IA */
+.chatbot-messages div:nth-child(even) {
+    background-color: #eeeeee;
+}
+
+/* ----- INPUT ----- */
+.chatbot-input {
+    display: flex;
+    gap: 10px;
+}
+
+.chatbot-input input[type="text"] {
+    flex: 1;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: #fff;
+    font-size: 14px;
+}
+
+.chatbot-input button {
+    background: #2f80ed;
+    color: white;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.chatbot-input button:hover {
+    background: #1e6fdb;
+}
+
+/* Fade slide effect */
+.fade-slide-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+}
+
+.fade-slide-in.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}

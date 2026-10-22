@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MY SYMPTOMS</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+<nav>
+    <div class="nav-title">MY SYMPTOMS</div>
+</nav>
+
+<hr><hr>
+
+<div class="container">
+
+     <!-- AI CHATBOT -->
+   
+    {% if dico_diseases or dico_drugs or dico_treamtent or results %}
+    
+    <div style="text-align: center; margin-top: 30px;">
+        <button onclick="toggleChatbot()">ASK AI</button>
+    </div>
+
+  
+    <div id="chatbot-section" class="fade-slide-in" style="display: none; margin-top: 20px;">
+        <div class="chatbot-box">
+            <h3>Ask our AI</h3>
+            <div id="chatbot-messages" class="chatbot-messages"></div>
+            <div class="chatbot-input">
+                <input type="text" id="chatbot-input" placeholder="Your answer...">
+                <button onclick="sendChat()">Send</button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- FORM SECTION -->
+   
+    <div id="form-section" {% if dico_diseases or dico_drugs or dico_treamtent or results %}style="display: none;"{% endif %}>
+
+        <div class="entry-block">
+            <form id="manual-form" action="/manual_results" method="post" onsubmit="prepareManualFormData()">
+                <div class="symptom-input-container" onclick="focusSymptomInput()">
+                    <div id="symptom-tags"></div>
+                    <input type="text" id="manual-symptom" placeholder="Enter symptom">
+                </div>
+
+                <div class="operator-toggle">
+                    <input type="radio" id="op-none" name="operator" value="" checked>
+                    <label for="op-none">None</label>
+
+                    <input type="radio" id="op-and" name="operator" value="AND">
+                    <label for="op-and">AND</label>
+
+                    <input type="radio" id="op-or" name="operator" value="OR">
+                    <label for="op-or">OR</label>
+                </div>
+
+                <input type="hidden" name="symptoms" id="manual-hidden-symptoms">
+                <input type="hidden" name="operator" id="manual-hidden-operator">
+                <button type="submit">Search</button>
+
+                {% if message %}
+                    <div class="error-message">{{ message }}</div>
+                {% endif %}
+
+            </form>
+        </div>
+    </div>
+
+    <!-- RESULTS SECTION -->
+    
+   
+    {% if dico_diseases or dico_drugs or dico_treamtent or results %}
+    <hr>
+    <h2>Results for:
+        {% if symptoms %}
+            {% for s in symptoms %}
+                "{{ s }}"{% if not loop.last %}, {% endif %}
+            {% endfor %}
+        {% else %}
+            No symptoms provided
+        {% endif %}
+    </h2>
+
+    {% if summary %}
+        <hr>
+        <h2>AI Summary</h2>
+        <p>{{ summary }}</p>
+    {% endif %}
+
+    <hr>
+
+    <div class="results-section">
+        <!-- Diseases -->
+        <div>
+            <h3>Possible Diseases</h3>
+
+            {% if sources_stat_diseases %}
+            <div class="source-stats">
+                <p><strong>OMIM:</strong> {{ sources_stat_diseases[0] }}</p>
+                <p><strong>ORPHA:</strong> {{ sources_stat_diseases[1] }}</p>
+                <hr>
+                <button onclick="toggleChart('chart-diseases', this)">Diagram</button>
+                <img id="chart-diseases" src="{{ url_for('static', filename='plots/diseases.png') }}" style="display:none; max-width: 300px; margin-top: 10px;">
+            </div>
+            {% endif %}
+
+            <hr>
+
+            <ul id="diseases-list">
+                {% for disease, source in dico_diseases.items() %}
+                    <li class="hover-detail {{ 'extra-disease' if loop.index > 10 else '' }}">
+                        {{ disease }}
+                        <div class="tooltip-content">
+                            <strong>Source:</strong> {{ source }}
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+            
+            {% if dico_diseases|length > 10 %}
+                <button type="button" onclick="toggle('disease')">See more</button>
+            {% endif %}
+        </div>
+
+        <!-- Medication Causes -->
+        <div>
+            <h3>Possible Medication Causes</h3>
+
+            {% if sources_stat_drugs %}
+            <div class="source-stats">
+                <p><strong>STITCH:</strong> {{ sources_stat_drugs[0] }}</p>
+                <p><strong>DRUGBANK:</strong> {{ sources_stat_drugs[1] }}</p>
+                <p><strong>STITCH + DRUGBANK:</strong> {{ sources_stat_drugs[2] }}</p>
+                <button onclick="toggleChart('chart-drugs', this)">Diagram</button>
+                <img id="chart-drugs" src="{{ url_for('static', filename='plots/drugs.png') }}" style="display:none; max-width: 300px; margin-top: 10px;">
+            </div>
+            {% endif %}
+
+            <hr>
+
+            <ul id="meds-list">
+                {% for med, info in dico_drugs.items() %}
+                    <li class="hover-detail {{ 'extra-med' if loop.index > 10 else '' }}">
+                        {{ med }}
+                        <div class="tooltip-content">
+                            <strong>Source :</strong> {{ info.source }}<br>
+                            {% if info.score is not none %}
+                                <strong>Score :</strong> {{ '%.2f'|format(info.score) }}
+                            {% else %}
+                                <strong>Score :</strong> N/A
+                            {% endif %}
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+            {% if dico_drugs|length > 10 %}
+                <button type="button" onclick="toggle('med')">See more</button>
+            {% endif %}
+        </div>
+
+        <!-- Treatments -->
+        <div>
+            <h3>Possible Treatments</h3>
+
+            {% if sources_stat_treatment %}
+            <div class="source-stats">
+                <p><strong>STITCH:</strong> {{ sources_stat_treatment[0] }}</p>
+                <p><strong>DRUGBANK:</strong> {{ sources_stat_treatment[1] }}</p>
+                <p><strong>STITCH + DRUGBANK:</strong> {{ sources_stat_treatment[2] }}</p>
+                <button onclick="toggleChart('chart-treatments', this)">Diagram</button>
+                <img id="chart-treatments" src="{{ url_for('static', filename='plots/treatments.png') }}" style="display:none; max-width: 300px; margin-top: 10px;">
+            </div>
+            {% endif %}
+            <hr>
+
+            <ul id="drugs-list">
+                {% for treat, source in dico_treamtent.items() %}
+                    <li class="hover-detail {{ 'extra-drug' if loop.index > 10 else '' }}">
+                        {{ treat }}
+                        <div class="tooltip-content">
+                            <strong>Source:</strong> {{ source }}
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+            
+            {% if dico_treamtent|length > 10 %}
+                <button type="button" onclick="toggle('drug')">See more</button>
+            {% endif %}
+        </div>
+    </div>
+<hr>
+
+    {% if dico_diseases or dico_drugs or dico_treamtent or results %}
+    <button onclick="showForms()" style="margin-bottom: 20px;">New Search</button>
+    {% endif %}
+
+    <hr>
+    <h2>Detailed HPO Matches</h2>
+    {% if results %}
+        <ul id="symptom-hpo-list">
+            {% for result in results %}
+                <li class="{{ 'extra-hpo' if loop.index > 10 else '' }}">
+                    <strong>{{ result.name }}</strong> (HPO ID: {{ result.id }})<br>
+                    <em>Synonyms:</em> {{ result.synonyms }}
+                </li>
+            {% endfor %}
+        </ul>
+        {% if results|length > 10 %}
+            <button type="button" onclick="toggle('hpo')">See more</button>
+        {% endif %}
+    {% else %}
+        <p>No HPO matches found for "{{ symptom }}".</p>
+    {% endif %}
+    {% endif %}
+</div>
+
+<!-- SCRIPTS -->
+   
+<script>
+    function toggleChatbot() {
+    const section = document.getElementById("chatbot-section");
+    const button = document.querySelector('button[onclick="toggleChatbot()"]');
+
+    if (section.style.display === "none" || section.style.display === "") {
+        section.style.display = "block";
+        setTimeout(() => {
+            section.classList.add("show");
+            section.scrollIntoView({ behavior: "smooth" });
+        }, 10);
+        fetchInitialAIResponse(); // ⬅️ charge le 1er message IA
+        button.textContent = "Close";
+    } else {
+        section.classList.remove("show");
+        setTimeout(() => {
+            section.style.display = "none";
+        }, 300);
+        button.textContent = "ASK AI";
+    }
+}
+    
+    function fetchInitialAIResponse() {
+        const messages = document.getElementById("chatbot-messages");
+        const aiMsg = document.createElement("div");
+        aiMsg.textContent = "AI: (loading...)";
+        aiMsg.style.fontStyle = "italic";
+        aiMsg.id = "initial-message";
+        messages.appendChild(aiMsg);
+    
+        fetch("/ask_ai", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: "" })  // message vide → première réponse
+        })
+        .then(res => res.json())
+        .then(data => {
+            const msg = document.getElementById("initial-message");
+            msg.textContent = "AI: " + data.response;
+        });
+    }
+    
+    function sendChat() {
+        const input = document.getElementById("chatbot-input");
+        const message = input.value.trim();
+        if (!message) return;
+    
+        const messages = document.getElementById("chatbot-messages");
+    
+        const userMsg = document.createElement("div");
+        userMsg.textContent = "You: " + message;
+        messages.appendChild(userMsg);
+    
+        input.value = "";
+    
+        const loadingMsg = document.createElement("div");
+        loadingMsg.textContent = "AI: ...";
+        loadingMsg.style.fontStyle = "italic";
+        messages.appendChild(loadingMsg);
+    
+        fetch("/ask_ai", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message })
+        })
+        .then(res => res.json())
+        .then(data => {
+            loadingMsg.remove();
+            const aiMsg = document.createElement("div");
+            aiMsg.textContent = "AI: " + data.response;
+            aiMsg.style.fontStyle = "italic";
+            messages.appendChild(aiMsg);
+            messages.scrollTop = messages.scrollHeight;
+        });
+    }
+    </script>
+<script>
+    let manualSymptoms = [];
+
+    function focusSymptomInput() {
+        document.getElementById("manual-symptom").focus();
+    }
+
+    function addManualSymptomFromInput() {
+        const input = document.getElementById("manual-symptom");
+        const symptom = input.value.trim();
+        if (symptom && !manualSymptoms.includes(symptom)) {
+            manualSymptoms.push(symptom);
+            input.value = "";
+            renderSymptomTags();
+        }
+    }
+
+    function removeSymptom(symptom) {
+        manualSymptoms = manualSymptoms.filter(s => s !== symptom);
+        renderSymptomTags();
+    }
+
+    function renderSymptomTags() {
+        const tagContainer = document.getElementById("symptom-tags");
+        tagContainer.innerHTML = "";
+        manualSymptoms.forEach(symptom => {
+            const tag = document.createElement("span");
+            tag.className = "symptom-tag";
+            tag.innerHTML = `${symptom} <span onclick="removeSymptom('${symptom}')">✖</span>`;
+            tagContainer.appendChild(tag);
+        });
+    }
+
+    function prepareManualFormData() {
+        const operator = document.querySelector('input[name="operator"]:checked').value;
+        document.getElementById("manual-hidden-symptoms").value = JSON.stringify(manualSymptoms);
+        document.getElementById("manual-hidden-operator").value = operator;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const input = document.getElementById("manual-symptom");
+        input.addEventListener("keydown", function(event) {
+            if (event.key === "Enter" || event.key === ",") {
+                event.preventDefault();
+                addManualSymptomFromInput();
+            }
+        });
+    });
+
+    function toggle(type) {
+        let items = document.querySelectorAll(`.extra-${type}`);
+        let isHidden = items[0].style.display === "none" || items[0].style.display === "";
+        items.forEach(item => {
+            item.style.display = isHidden ? "list-item" : "none";
+        });
+        event.target.textContent = isHidden ? "See less" : "See more";
+    }
+
+    function showForms() {
+        document.getElementById("form-section").style.display = "block";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    window.onload = () => {
+        ['disease', 'med', 'drug', 'hpo'].forEach(type => {
+            document.querySelectorAll(`.extra-${type}`).forEach(item => {
+                item.style.display = "none";
+            });
+        });
+    };
+</script>
+<script>
+    function toggleChart(id, button) {
+        const canvas = document.getElementById(id);
+        if (canvas.style.display === "none" || canvas.style.display === "") {
+            canvas.style.display = "block";
+            button.textContent = "Hide";
+        } else {
+            canvas.style.display = "none";
+            button.textContent = "Diagram";
+        }
+    }
+</script>
+
+</html>

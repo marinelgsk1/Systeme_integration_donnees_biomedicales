@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Redirecting...</title>
+</head>
+<body>
+    <p>Processing your request... Redirecting to results.</p>
+    <form id="redirectForm" action="/results" method="POST">
+        <input type="hidden" name="symptom" value="{{ symptom }}">
+        <input type="hidden" name="symptoms" value='{{ symptoms_json }}'>
+        <input type="hidden" name="operator" value="{{ operator }}">
+    </form>
+
+    <script>
+        document.getElementById("redirectForm").submit();
+    </script>
+</body>
+</html>

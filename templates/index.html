@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Symptom Checker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            text-align: center;
+        }
+        input, button, select {
+            margin: 10px;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            cursor: pointer;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background: #e9ecef;
+            margin: 5px;
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .delete {
+            cursor: pointer;
+            color: red;
+            font-weight: bold;
+            font-size: 18px;
+        }
+    </style>
+<script>
+    let operator = "";  // Par défaut, aucun opérateur (mode recherche simple)
+    let symptomsList = [];  // Liste des symptômes
+
+    function setOperator(value) {
+        operator = value;
+        document.getElementById("selected-operator").textContent = operator || "Aucun opérateur";
+        updateUI();
+    }
+
+    function addSymptom() {
+        let symptomInput = document.getElementById("symptom");
+        let symptom = symptomInput.value.trim();
+
+        if (symptom !== "") {
+            if (!symptomsList.includes(symptom)) {
+                symptomsList.push(symptom);
+                symptomInput.value = "";  // Effacer l’input après ajout
+                updateUI();
+            }
+        }
+    }
+
+    function removeSymptom(symptom) {
+        symptomsList = symptomsList.filter(item => item !== symptom);
+        updateUI();
+    }
+
+    function updateUI() {
+        let symptomsListElement = document.getElementById("symptoms-list");
+        symptomsListElement.innerHTML = "";  // Effacer l'affichage actuel
+
+        symptomsList.forEach(symptom => {
+            let newItem = document.createElement("li");
+            newItem.textContent = symptom;
+            
+            // Bouton supprimer
+            let deleteButton = document.createElement("span");
+            deleteButton.textContent = "❌";
+            deleteButton.classList.add("delete");
+            deleteButton.onclick = function() { removeSymptom(symptom); };
+
+            newItem.appendChild(deleteButton);
+            symptomsListElement.appendChild(newItem);
+        });
+
+        // Mettre à jour le bouton de recherche
+        document.getElementById("search-btn").disabled = symptomsList.length === 0;
+    }
+
+    function prepareFormData() {
+        let hiddenSymptoms = document.getElementById("hidden-symptoms");
+        let hiddenOperator = document.getElementById("hidden-operator");
+
+        hiddenSymptoms.value = JSON.stringify(symptomsList);
+        hiddenOperator.value = operator; // Si pas d'opérateur, ce sera une chaîne vide ""
+    }
+</script>
+
+
+</head>
+<body>
+    <h1>Symptom Checker</h1>
+    <p>Enter symptoms and select AND/OR operator.</p>
+
+    <form id="search-form" action="/results" method="post" onsubmit="prepareFormData()">
+        <label for="operator">Operator:</label>
+        <select id="operator" onchange="setOperator(this.value)">
+            <option value="AND">AND</option>
+            <option value="OR">OR</option>
+        </select>
+        <br>
+        <label for="symptom">Symptom:</label>
+        <input type="text" id="symptom" name="symptom">
+        <button type="button" onclick="addSymptom()">Add Symptom</button>
+        <ul id="symptoms-list"></ul>
+        
+        <!-- Hidden inputs to store symptoms and operator -->
+        <input type="hidden" id="hidden-symptoms" name="symptoms">
+        <input type="hidden" id="hidden-operator" name="operator">
+
+        <br>
+        <button type="submit">Search</button>
+    </form>
+</body>
+</html>
